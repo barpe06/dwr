@@ -7,6 +7,7 @@ using connect.Service.docusign;
 using DocuSign.eSign.Model;
 using connect.Service.docusign.utils;
 using System.ComponentModel;
+using System.IO;
 
 namespace connect.Service.hangfire.tasks
 {
@@ -25,10 +26,20 @@ namespace connect.Service.hangfire.tasks
         public static void uploadDocument(string domain, string account,
             string envelopeId, string documentId, DocumentOptions options)
         {
-            DocuSignService.GetDocument(domain, account,
+            MemoryStream docStream = DocuSignService.GetDocument(domain, account,
                 envelopeId,
                 documentId,
                 options);
+
+            /*docStream.Seek(0, SeekOrigin.Begin);
+            docStream.CopyTo(fs);
+
+            int bytesRead;
+            byte[] buffer = new byte[16384];
+            while ((bytesRead = docStream.ReadAsync(buffer)))
+            {
+                os.write(buffer, 0, bytesRead);
+            }*/
         }
     }
 }   

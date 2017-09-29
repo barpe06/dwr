@@ -214,6 +214,8 @@
     <Compile Include="Models\docusign\connect\DocuSignEnvelopeInformation.cs" />
     <Compile Include="Models\docusign\connect\JobDocument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\documentum\DocumentumService.cs" />
+    <Compile Include="Service\documentum\utils\DocmentumServiceUtils.cs" />
     <Compile Include="Service\docusign\DocuSignCredentials.cs" />
     <Compile Include="Service\docusign\DocuSignService.cs" />
     <Compile Include="Service\docusign\utils\DocumentRetrieveOptions.cs" />

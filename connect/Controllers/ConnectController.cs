@@ -42,7 +42,7 @@ namespace connect.Controllers
                 dsEnv.AccountId,
                 dsEnvInfo.EnvelopeStatus.EnvelopeID,
                 "combined",
-                DocumentOptions.Combined));
+                DocumentOptions.Combined_No_Cert));
             Log.Info("Hangfire JobId created: " +  jobId);
 
             ConnectProcessResponse response = new ConnectProcessResponse(dsEnvInfo.EnvelopeStatus.EnvelopeID, jobId);

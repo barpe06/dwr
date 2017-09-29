@@ -24,6 +24,13 @@ namespace connect.Service.docusign
             {
                 options = new EnvelopesApi.GetDocumentOptions();
                 documentId = "combined";
+                options.certificate = "true";
+
+            }
+            if (documentOptions == DocumentOptions.Combined_No_Cert)
+            {
+                options = new EnvelopesApi.GetDocumentOptions();
+                documentId = "combined";
                 options.certificate = "false";
 
             }

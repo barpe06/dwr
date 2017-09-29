@@ -34,7 +34,7 @@ namespace connect.Service.documentum
 
         static DocumentumService()
         {
-            documentumUrl = ConfigurationManager.AppSettings["documentumUrl"];
+            documentumUrl = ConfigurationManager.AppSettings["documentumFCPort"];
             documentumUserName = ConfigurationManager.AppSettings["documentumUserName"];
             documentumPassword = ConfigurationManager.AppSettings["documentumPassword"];
 
