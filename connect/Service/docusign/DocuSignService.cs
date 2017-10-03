@@ -34,12 +34,20 @@ namespace connect.Service.docusign
                 options.certificate = "false";
 
             }
-            // GetDocument() API call returns a MemoryStream
-            Log.Info("Retriving Document " + documentId + " for envelope: " + envelopeId +
-                " environment: " + domain + ":" + account);
-            ServiceUtil.ConfigureApiClient(domain);
-            envelopesApi = new EnvelopesApi();
-            MemoryStream docStream = (MemoryStream)envelopesApi.GetDocument(account, envelopeId, documentId, options);
+            MemoryStream docStream = null;
+            try
+            {
+                // GetDocument() API call returns a MemoryStream
+                Log.Info("Retriving Document " + documentId + " for envelope: " + envelopeId +
+                    " environment: " + domain + ":" + account);
+                ServiceUtil.ConfigureApiClient(domain);
+                envelopesApi = new EnvelopesApi();
+                docStream = (MemoryStream)envelopesApi.GetDocument(account, envelopeId, documentId, options);
+            }
+            catch (ApiException ex)
+            {
+                Log.Error(ex);
+            }
             return docStream;
         }
 

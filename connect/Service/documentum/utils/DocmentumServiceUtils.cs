@@ -10,19 +10,24 @@ namespace connect.Service.documentum.utils
      
     public class DocmentumServiceUtils
     {
-        public static void ConfigureApiClient(string domain)
+        public static void ConfigureApiClient(string repo)
         {
-            ApiClient apiClient = new ApiClient(ConfigurationManager.AppSettings["documentumUrl"]);
+            ApiClient apiClient = new ApiClient(ConfigurationManager.AppSettings["documentumUrl"].Replace("{REPO}", repo));
             string authHeader = " Basic " + CreateBasicBearToken(ConfigurationManager.AppSettings["dsUserName"],
                 ConfigurationManager.AppSettings["dsUserPassword"]);
             // set client in global config so we don't need to pass it to each API object.
             DocuSign.eSign.Client.Configuration.Default.ApiClient = apiClient;
 
+            if (DocuSign.eSign.Client.Configuration.Default.DefaultHeader.ContainsKey("X-DocuSign-Authentication"))
+            {
+                DocuSign.eSign.Client.Configuration.Default.DefaultHeader.Remove("X-DocuSign-Authentication");
+            }
             if (DocuSign.eSign.Client.Configuration.Default.DefaultHeader.ContainsKey("Authorization"))
             {
                 DocuSign.eSign.Client.Configuration.Default.DefaultHeader.Remove("Authorization");
             }
             DocuSign.eSign.Client.Configuration.Default.AddDefaultHeader("Authorization", authHeader);
+            DocuSign.eSign.Client.Configuration.Default.AddDefaultHeader("Content-Type", "application/vnd.emc.documentum+json");
         }
 
         private static string CreateBasicBearToken(string userName, string password)

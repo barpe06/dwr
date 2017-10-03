@@ -210,10 +210,14 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\documentum\ContentProperty.cs" />
+    <Compile Include="Models\documentum\ContentPropertyResponse.cs" />
     <Compile Include="Models\docusign\connect\ConnectProcessResponse.cs" />
     <Compile Include="Models\docusign\connect\DocuSignEnvelopeInformation.cs" />
     <Compile Include="Models\docusign\connect\JobDocument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\documentum\api\DocumentumApi.cs" />
+    <Compile Include="Service\documentum\api\IDocumentumApi.cs" />
     <Compile Include="Service\documentum\DocumentumService.cs" />
     <Compile Include="Service\documentum\utils\DocmentumServiceUtils.cs" />
     <Compile Include="Service\docusign\DocuSignCredentials.cs" />

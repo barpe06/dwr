@@ -15,6 +15,7 @@ namespace connect
             // Web API routes
             config.MapHttpAttributeRoutes();
             config.Formatters.XmlFormatter.UseXmlSerializer = true;
+            config.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
             log4net.Config.XmlConfigurator.Configure();
 
             config.Routes.MapHttpRoute(

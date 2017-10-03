@@ -1,14 +1,13 @@
-﻿using Emc.Documentum.FS.DataModel.Core;
-using Emc.Documentum.FS.DataModel.Core.Content;
-using Emc.Documentum.FS.DataModel.Core.Context;
-using Emc.Documentum.FS.DataModel.Core.Profiles;
+﻿using connect.Models.documentum;
+using connect.Service.documentum.api;
+using connect.Service.documentum.utils;
+using DocuSign.eSign.Client;
+using Emc.Documentum.FS.DataModel.Core;
 using Emc.Documentum.FS.Runtime.Context;
 using Emc.Documentum.FS.Services.Core;
+using log4net;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Web;
+
 
 namespace connect.Service.documentum
 {
@@ -31,15 +30,16 @@ namespace connect.Service.documentum
         private static IServiceContext serviceContext;
         private static IObjectService objectService;
         private static IQueryService querySvc;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(DocumentumService));
 
         static DocumentumService()
         {
-            documentumUrl = ConfigurationManager.AppSettings["documentumFCPort"];
-            documentumUserName = ConfigurationManager.AppSettings["documentumUserName"];
-            documentumPassword = ConfigurationManager.AppSettings["documentumPassword"];
+            documentumUrl = System.Configuration.ConfigurationManager.AppSettings["documentumFCPort"];
+            documentumUserName = System.Configuration.ConfigurationManager.AppSettings["documentumUserName"];
+            documentumPassword = System.Configuration.ConfigurationManager.AppSettings["documentumPassword"];
 
             // perform initialization here
-            ContextFactory contextFactory = ContextFactory.Instance;
+            /*ContextFactory contextFactory = ContextFactory.Instance;
             serviceContext = contextFactory.NewContext();
             RepositoryIdentity repositoryIdentity =
                 new RepositoryIdentity(repository, documentumUserName, documentumPassword, "");
@@ -47,7 +47,34 @@ namespace connect.Service.documentum
 
             ServiceFactory serviceFactory = ServiceFactory.Instance;
             objectService = serviceFactory.GetRemoteService<IObjectService>(serviceContext, moduleName, "");
-            querySvc = serviceFactory.GetRemoteService<IQueryService>(serviceContext, moduleName, "");
+            querySvc = serviceFactory.GetRemoteService<IQueryService>(serviceContext, moduleName, "");*/
+           
+        }
+
+        public static ContentPropertyResponse CreateContentlessDocumentLinkToFolder(string repo, string folderId)
+        {
+            DocmentumServiceUtils.ConfigureApiClient(repo);
+            ContentProperty contentProperty = new ContentProperty();
+            contentProperty.properties = new PropertiesType();
+            contentProperty.properties.r_object_type = "dwr_gen_doc";
+            contentProperty.properties.object_name = "readme6";
+            contentProperty.properties.author_creator = "Pedro Barroso";
+            contentProperty.properties.author_date = "2017-09-26"; // new DateTime(2017, 9, 26);
+            contentProperty.properties.topic_subject = "The subject";
+            //contentProperty.properties.r_full_content_size = 100;
+            //contentProperty.properties.format_name = "txt";
+            IDocumentumApi documentumApi = new DocumentumApi();
+            ContentPropertyResponse response = null;
+            try
+            {
+                response = documentumApi.CreateContentlessDocument(repo, folderId, contentProperty);
+            } 
+            catch (ApiException ex)
+            {
+                Log.Error(ex);
+            }
+            return response;
+
         }
         public static DataObject uploadDocument(string repo, string folder)
         {

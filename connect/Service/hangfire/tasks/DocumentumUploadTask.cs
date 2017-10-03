@@ -8,11 +8,16 @@ using DocuSign.eSign.Model;
 using connect.Service.docusign.utils;
 using System.ComponentModel;
 using System.IO;
+using connect.Models.documentum;
+using connect.Service.documentum;
+using log4net;
 
 namespace connect.Service.hangfire.tasks
 {
     public static class DocumentumUploadTask
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(DocumentumUploadTask));
+
         //[DisplayName("Send order #{envelopeInfo.EnvelopeStatus.EnvelopeID} to warehouse")]
         /*public static void uploadDocuments(DocuSignEnvelopeInformation envelopeInfo)
         {
@@ -40,6 +45,9 @@ namespace connect.Service.hangfire.tasks
             {
                 os.write(buffer, 0, bytesRead);
             }*/
+
+            ContentPropertyResponse response = DocumentumService.CreateContentlessDocumentLinkToFolder("ECMTEST", "0b7e5f9f80458b40");
+            Log.Debug("Properties created: " + response.properties);
         }
     }
 }   
