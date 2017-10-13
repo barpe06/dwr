@@ -101,6 +101,19 @@ namespace connect.Service.documentum
           return sampleDataObject; 
         }
         
+         public static DataObject uploadDocument(string repo, string folder, byte[] documentBytes){
 
+             var documentumApi = new DocumentumApi();
+             ContentProperty contentProperty = new ContentProperty();
+            contentProperty.properties = new PropertiesType();
+            contentProperty.properties.r_object_type = "dwr_gen_doc";
+            contentProperty.properties.object_name = "pedro-test";
+            contentProperty.properties.author_creator = "Pedro Barroso";
+            contentProperty.properties.author_date = "2017-09-26"; // new DateTime(2017, 9, 26);
+            contentProperty.properties.topic_subject = "The subject";
+
+             documentumApi.UploadDocsWithProperties(repo, folder, documentBytes, "pedro-test", contentProperty);
+             return null;
+         }
     }
 }

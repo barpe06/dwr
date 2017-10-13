@@ -1,9 +1,14 @@
 ﻿using connect.Models.documentum;
+using connect.Service.documentum.utils;
 using DocuSign.eSign.Client;
+using log4net;
+using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 
 namespace connect.Service.documentum.api
 {
@@ -14,7 +19,8 @@ namespace connect.Service.documentum.api
     public partial class DocumentumApi : IDocumentumApi
     {
         private DocuSign.eSign.Client.ExceptionFactory _exceptionFactory = (name, response) => null;
-        
+        private static readonly ILog Log = LogManager.GetLogger(typeof(DocumentumApi));
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentumApi"/> class.
         /// </summary>
@@ -169,5 +175,111 @@ namespace connect.Service.documentum.api
             ApiResponse<ContentPropertyResponse> localVarResponse = CreateContentlessDocumentWithHttpInfo(repo, folderId, contentProperty);
             return localVarResponse.Data;
         }
+        
+        public RestResponse<bool> PutEnvelopesDocuments(ContentPropertyResponse  contentResponse, string documentId, string fullFileName, byte[] documentBytes)
+        {
+            IList<Link> links = contentResponse.links;
+            IEnumerable<Link> query = links.Where(link => link.rel.CompareTo("contents") == 0);
+            Link contentsList = query.First();
+            var restClient = new RestClient(contentsList.href);
+            RestRequest request = new RestRequest(Method.PUT);
+
+            /*request.AddUrlSegment("envelopeId", envelopeId);
+            request.AddUrlSegment("documentId", documentId);
+            request.AddHeader("Content-Type", "application/pdf");
+            request.AddHeader("Content-Disposition",
+                string.Format("file; filename=\"{0}\"; documentid={1}; fileExtension=\"{2}\"",
+                Path.GetFileNameWithoutExtension(fullFileName), documentId, Path.GetExtension(fullFileName)));*/
+            request.AddHeader("Accept", "application/pdf");
+            request.AddParameter("application/pdf", documentBytes, ParameterType.RequestBody);
+
+            var response = restClient.Execute(request);
+
+            //return RestResponse<bool>.Create(response, restClientBuildUri(response.Request));
+            return null;
+        }
+
+        public void UploadDocsWithProperties2(string repo, string folderId, byte[] documentBytes, string fileName, ContentProperty contentProperty = null)
+        {
+            var request = new RestRequest("/" + repo + "/folders/" + folderId + "/documents", Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            request.AddBody(contentProperty);
+            request.AddFileBytes("content", documentBytes, fileName, "application/pdf");
+            /* RestResponse<bool>
+             * request.AddParameter("object[name]", "object");
+            request.AddParameter("object[tag_number]", tagnr);
+            request.AddParameter("machine[serial_number]", machinenr);
+            request.AddParameter("machine[safe_token]", safe_token);
+            request.AddFile("receipt[receipt_file]", File.ReadAllBytes(path), "Invoice.pdf", "application/octet-stream");
+            */
+            request.AddHeader("Authorization", DocmentumServiceUtils.CreateBasicBearToken());
+            RestClient restClient = new RestClient(
+                System.Configuration.ConfigurationManager.AppSettings["documentumUrl"].Replace("{REPO}", repo));
+            var response = restClient.Execute(request);
+            Log.Info("Called documentum with response: " + response);
+        }
+
+        public void UploadDocsWithProperties(string repo, string folderId, byte[] documentBytes, string fileName, ContentProperty contentProperty = null)
+        {
+
+            string requestHost = System.Configuration.ConfigurationManager.AppSettings["documentumUrl"].Replace("{REPO}", repo);
+            var localVarPath = "/folders/{folderId}/documents?overwrite=true".Replace("{folderId}", folderId);
+
+            // Create a http request to the server endpoint that will pick up the
+            // file and file description.
+            HttpWebRequest requestToServerEndpoint =
+                (HttpWebRequest)WebRequest.Create(requestHost + localVarPath);
+            string boundaryString = "FFF3F395A90B452BB8BEDC878DDBD152";
+            
+            // Set the http request header \\
+            requestToServerEndpoint.Method = WebRequestMethods.Http.Post;
+            requestToServerEndpoint.ContentType = "multipart/form-data; boundary=" + boundaryString;
+            requestToServerEndpoint.KeepAlive = true;
+            requestToServerEndpoint.Headers.Add("Authorization", "Basic " + DocmentumServiceUtils.CreateBasicBearToken()); 
+            requestToServerEndpoint.Accept = "application/vnd.emc.documentum+json";
+
+            // Use a MemoryStream to form the post data request,
+            // so that we can get the content-length attribute.
+            MemoryStream postDataStream = new MemoryStream();
+            StreamWriter postDataWriter = new StreamWriter(postDataStream);
+
+            // Include value from the tag_number text area in the post data
+            postDataWriter.Write("\r\n--" + boundaryString + "\r\n");
+            postDataWriter.Write("Content-Disposition: form-data; name=\"object\"\r\n");
+            postDataWriter.Write("Content-Type: application/vnd.emc.documentum+json;charset=UTF-8\r\n\r\n");
+            postDataWriter.Write(JsonConvert.SerializeObject(contentProperty));
+
+            // Include the file in the post data
+            postDataWriter.Write("\r\n--" + boundaryString + "\r\n");
+            postDataWriter.Write("Content-Disposition: form-data; name=\"content\"\r\n");
+            postDataWriter.Write("Content-Type: application/pdf\r\n\r\n");
+            //postDataWriter.Write("Content-Type: plain/text; charset=UTF-8\r\n\r\n");
+
+           // postDataWriter.Write("Content-Type: application/octet-stream\r\n");
+            //postDataWriter.Write("Content-Transfer-Encoding: binary\r\n\r\n");
+
+            postDataWriter.Flush();
+
+            postDataStream.Write(documentBytes, 0, documentBytes.Length);
+            //postDataWriter.Write("Hello world");
+
+            postDataWriter.Write("\r\n--" + boundaryString + "--\r\n");
+            postDataWriter.Flush();
+
+            // Set the http request body content length
+            requestToServerEndpoint.ContentLength = postDataStream.Length;
+
+            // Dump the post data from the memory stream to the request stream
+            Stream s = requestToServerEndpoint.GetRequestStream();
+
+            postDataStream.WriteTo(s);
+
+            postDataStream.Close();
+            s.Close();
+
+            var response = requestToServerEndpoint.GetResponse();
+            Log.Info("Called documentum with response: " + response);
+        }
+
     }
 }

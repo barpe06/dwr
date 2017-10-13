@@ -36,18 +36,14 @@ namespace connect.Service.hangfire.tasks
                 documentId,
                 options);
 
-            /*docStream.Seek(0, SeekOrigin.Begin);
-            docStream.CopyTo(fs);
 
-            int bytesRead;
-            byte[] buffer = new byte[16384];
-            while ((bytesRead = docStream.ReadAsync(buffer)))
-            {
-                os.write(buffer, 0, bytesRead);
-            }*/
 
-            ContentPropertyResponse response = DocumentumService.CreateContentlessDocumentLinkToFolder("ECMTEST", "0b7e5f9f80458b40");
-            Log.Debug("Properties created: " + response.properties);
+            byte[] buffer = ServiceUtil.ReadFully(docStream);
+           
+
+            //ContentPropertyResponse response = DocumentumService.CreateContentlessDocumentLinkToFolder("ECMTEST", "0b7e5f9f80458b40");
+            var response = DocumentumService.uploadDocument("ECMTEST", "0b7e5f9f80458b40", buffer);
+            Log.Debug("Properties created: ");
         }
     }
 }   

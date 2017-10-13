@@ -30,11 +30,13 @@ namespace connect.Service.documentum.utils
             DocuSign.eSign.Client.Configuration.Default.AddDefaultHeader("Content-Type", "application/vnd.emc.documentum+json");
         }
 
-        private static string CreateBasicBearToken(string userName, string password)
+        public static string CreateBasicBearToken(string userName = null, string password = null)
         {
-            string baseOauth = ConfigurationManager.AppSettings["documentumUserName"] 
-                + ":"
-                + ConfigurationManager.AppSettings["documentumPassword"];
+            string documentumUserName = null;
+            string documentumPassword = null;
+            if (userName == null) userName = ConfigurationManager.AppSettings["documentumUserName"];
+            if (password == null) password = ConfigurationManager.AppSettings["documentumPassword"];
+            string baseOauth = userName + ":" + password;
             return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(baseOauth));
         }
     }
