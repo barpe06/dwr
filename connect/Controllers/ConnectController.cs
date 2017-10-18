@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using connect.Service.documentum.utils;
 
 namespace connect.Controllers
 {
@@ -37,9 +38,8 @@ namespace connect.Controllers
             var dsEnv = ServiceUtil.buildEnvironment(dsEnvInfo);
             Log.Info("Processing envelopeId " + dsEnvInfo.EnvelopeStatus.EnvelopeID);
             Log.Info("Creating HangFire backgoundJob ");
-
-            var jobId = Hangfire.BackgroundJob.Enqueue(() => DocumentumUploadTask.uploadDocument(dsEnv.Environment, 
-                dsEnv.AccountId,
+            IDictionary<string, string> localECF = DocumentumServiceUtils.getDocumentProperties(dsEnvInfo);
+            var jobId = Hangfire.BackgroundJob.Enqueue(() => DocumentumUploadTask.uploadDocument(localECF,
                 dsEnvInfo.EnvelopeStatus.EnvelopeID,
                 "combined",
                 DocumentOptions.Combined_No_Cert));

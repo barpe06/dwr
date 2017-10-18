@@ -36,12 +36,6 @@ namespace DocuSign.Connect
         public string DocumentID { get; set; }
         [XmlElement(ElementName = "PageNumber", Namespace = "http://www.docusign.net/API/3.0")]
         public string PageNumber { get; set; }
-        [XmlElement(ElementName = "OriginalValue", Namespace = "http://www.docusign.net/API/3.0")]
-        public string OriginalValue { get; set; }
-        [XmlElement(ElementName = "CustomTabType", Namespace = "http://www.docusign.net/API/3.0")]
-        public string CustomTabType { get; set; }
-        [XmlElement(ElementName = "ValidationPattern", Namespace = "http://www.docusign.net/API/3.0")]
-        public string ValidationPattern { get; set; }
     }
 
     [XmlRoot(ElementName = "TabStatuses", Namespace = "http://www.docusign.net/API/3.0")]
@@ -49,6 +43,52 @@ namespace DocuSign.Connect
     {
         [XmlElement(ElementName = "TabStatus", Namespace = "http://www.docusign.net/API/3.0")]
         public List<TabStatus> TabStatus { get; set; }
+    }
+
+    [XmlRoot(ElementName = "Attachment", Namespace = "http://www.docusign.net/API/3.0")]
+    public class Attachment
+    {
+        [XmlElement(ElementName = "Data", Namespace = "http://www.docusign.net/API/3.0")]
+        public string Data { get; set; }
+        [XmlElement(ElementName = "Label", Namespace = "http://www.docusign.net/API/3.0")]
+        public string Label { get; set; }
+    }
+
+    [XmlRoot(ElementName = "RecipientAttachment", Namespace = "http://www.docusign.net/API/3.0")]
+    public class RecipientAttachment
+    {
+        [XmlElement(ElementName = "Attachment", Namespace = "http://www.docusign.net/API/3.0")]
+        public Attachment Attachment { get; set; }
+    }
+
+    [XmlRoot(ElementName = "field", Namespace = "http://www.docusign.net/API/3.0")]
+    public class Field
+    {
+        [XmlElement(ElementName = "value", Namespace = "http://www.docusign.net/API/3.0")]
+        public string Value { get; set; }
+        [XmlAttribute(AttributeName = "name")]
+        public string Name { get; set; }
+    }
+
+    [XmlRoot(ElementName = "fields", Namespace = "http://www.docusign.net/API/3.0")]
+    public class Fields
+    {
+        [XmlElement(ElementName = "field", Namespace = "http://www.docusign.net/API/3.0")]
+        public List<Field> Field { get; set; }
+    }
+
+    [XmlRoot(ElementName = "xfdf", Namespace = "http://www.docusign.net/API/3.0")]
+    public class Xfdf
+    {
+        [XmlElement(ElementName = "fields", Namespace = "http://www.docusign.net/API/3.0")]
+        public Fields Fields { get; set; }
+    }
+
+    [XmlRoot(ElementName = "FormData", Namespace = "http://www.docusign.net/API/3.0")]
+    public class FormData
+    {
+        [XmlElement(ElementName = "xfdf", Namespace = "http://www.docusign.net/API/3.0")]
+        public Xfdf Xfdf { get; set; }
     }
 
     [XmlRoot(ElementName = "RecipientStatus", Namespace = "http://www.docusign.net/API/3.0")]
@@ -66,6 +106,8 @@ namespace DocuSign.Connect
         public string Sent { get; set; }
         [XmlElement(ElementName = "Delivered", Namespace = "http://www.docusign.net/API/3.0")]
         public string Delivered { get; set; }
+        [XmlElement(ElementName = "Signed", Namespace = "http://www.docusign.net/API/3.0")]
+        public string Signed { get; set; }
         [XmlElement(ElementName = "DeclineReason", Namespace = "http://www.docusign.net/API/3.0")]
         public DeclineReason DeclineReason { get; set; }
         [XmlElement(ElementName = "Status", Namespace = "http://www.docusign.net/API/3.0")]
@@ -76,17 +118,34 @@ namespace DocuSign.Connect
         public string CustomFields { get; set; }
         [XmlElement(ElementName = "TabStatuses", Namespace = "http://www.docusign.net/API/3.0")]
         public TabStatuses TabStatuses { get; set; }
+        [XmlElement(ElementName = "RecipientAttachment", Namespace = "http://www.docusign.net/API/3.0")]
+        public RecipientAttachment RecipientAttachment { get; set; }
         [XmlElement(ElementName = "AccountStatus", Namespace = "http://www.docusign.net/API/3.0")]
         public string AccountStatus { get; set; }
+        [XmlElement(ElementName = "FormData", Namespace = "http://www.docusign.net/API/3.0")]
+        public FormData FormData { get; set; }
         [XmlElement(ElementName = "RecipientId", Namespace = "http://www.docusign.net/API/3.0")]
         public string RecipientId { get; set; }
+        [XmlElement(ElementName = "EsignAgreementInformation", Namespace = "http://www.docusign.net/API/3.0")]
+        public EsignAgreementInformation EsignAgreementInformation { get; set; }
+    }
+
+    [XmlRoot(ElementName = "EsignAgreementInformation", Namespace = "http://www.docusign.net/API/3.0")]
+    public class EsignAgreementInformation
+    {
+        [XmlElement(ElementName = "AccountEsignId", Namespace = "http://www.docusign.net/API/3.0")]
+        public string AccountEsignId { get; set; }
+        [XmlElement(ElementName = "UserEsignId", Namespace = "http://www.docusign.net/API/3.0")]
+        public string UserEsignId { get; set; }
+        [XmlElement(ElementName = "AgreementDate", Namespace = "http://www.docusign.net/API/3.0")]
+        public string AgreementDate { get; set; }
     }
 
     [XmlRoot(ElementName = "RecipientStatuses", Namespace = "http://www.docusign.net/API/3.0")]
     public class RecipientStatuses
     {
         [XmlElement(ElementName = "RecipientStatus", Namespace = "http://www.docusign.net/API/3.0")]
-        public RecipientStatus RecipientStatus { get; set; }
+        public List<RecipientStatus> RecipientStatus { get; set; }
     }
 
     [XmlRoot(ElementName = "CustomField", Namespace = "http://www.docusign.net/API/3.0")]
@@ -128,7 +187,7 @@ namespace DocuSign.Connect
     public class DocumentStatuses
     {
         [XmlElement(ElementName = "DocumentStatus", Namespace = "http://www.docusign.net/API/3.0")]
-        public DocumentStatus DocumentStatus { get; set; }
+        public List<DocumentStatus> DocumentStatus { get; set; }
     }
 
     [XmlRoot(ElementName = "EnvelopeStatus", Namespace = "http://www.docusign.net/API/3.0")]
@@ -154,6 +213,10 @@ namespace DocuSign.Connect
         public string Sent { get; set; }
         [XmlElement(ElementName = "Delivered", Namespace = "http://www.docusign.net/API/3.0")]
         public string Delivered { get; set; }
+        [XmlElement(ElementName = "Signed", Namespace = "http://www.docusign.net/API/3.0")]
+        public string Signed { get; set; }
+        [XmlElement(ElementName = "Completed", Namespace = "http://www.docusign.net/API/3.0")]
+        public string Completed { get; set; }
         [XmlElement(ElementName = "ACStatus", Namespace = "http://www.docusign.net/API/3.0")]
         public string ACStatus { get; set; }
         [XmlElement(ElementName = "ACStatusDate", Namespace = "http://www.docusign.net/API/3.0")]
@@ -187,16 +250,11 @@ namespace DocuSign.Connect
     {
         [XmlElement(ElementName = "EnvelopeStatus", Namespace = "http://www.docusign.net/API/3.0")]
         public EnvelopeStatus EnvelopeStatus { get; set; }
-        [XmlElement(ElementName = "TimeZone", Namespace = "http://www.docusign.net/API/3.0")]
-        public string TimeZone { get; set; }
-        [XmlElement(ElementName = "TimeZoneOffset", Namespace = "http://www.docusign.net/API/3.0")]
-        public string TimeZoneOffset { get; set; }
-        [XmlAttribute(AttributeName = "xmlns")]
-        public string Xmlns { get; set; }
         [XmlAttribute(AttributeName = "xsd", Namespace = "http://www.w3.org/2000/xmlns/")]
         public string Xsd { get; set; }
         [XmlAttribute(AttributeName = "xsi", Namespace = "http://www.w3.org/2000/xmlns/")]
         public string Xsi { get; set; }
+        [XmlAttribute(AttributeName = "xmlns")]
+        public string Xmlns { get; set; }
     }
-
 }

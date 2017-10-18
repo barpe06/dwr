@@ -7,6 +7,8 @@ using Emc.Documentum.FS.Runtime.Context;
 using Emc.Documentum.FS.Services.Core;
 using log4net;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 
 namespace connect.Service.documentum
@@ -53,7 +55,7 @@ namespace connect.Service.documentum
 
         public static ContentPropertyResponse CreateContentlessDocumentLinkToFolder(string repo, string folderId)
         {
-            DocmentumServiceUtils.ConfigureApiClient(repo);
+            DocumentumServiceUtils.ConfigureApiClient(repo);
             ContentProperty contentProperty = new ContentProperty();
             contentProperty.properties = new PropertiesType();
             contentProperty.properties.r_object_type = "dwr_gen_doc";
@@ -101,18 +103,18 @@ namespace connect.Service.documentum
           return sampleDataObject; 
         }
         
-         public static DataObject uploadDocument(string repo, string folder, byte[] documentBytes){
-
+         public static DataObject uploadDocument(IDictionary<string,string> ecf, byte[] documentBytes){
              var documentumApi = new DocumentumApi();
-             ContentProperty contentProperty = new ContentProperty();
-            contentProperty.properties = new PropertiesType();
-            contentProperty.properties.r_object_type = "dwr_gen_doc";
-            contentProperty.properties.object_name = "pedro-test";
-            contentProperty.properties.author_creator = "Pedro Barroso";
-            contentProperty.properties.author_date = "2017-09-26"; // new DateTime(2017, 9, 26);
-            contentProperty.properties.topic_subject = "The subject";
-
-             documentumApi.UploadDocsWithProperties(repo, folder, documentBytes, "pedro-test", contentProperty);
+             try
+             {
+                 documentumApi.UploadDocsWithProperties(ecf, documentBytes);
+             }
+             catch (ApiException ex)
+             {
+                 Log.Error(ex.ErrorContent);
+                 throw ex;
+             }
+            
              return null;
          }
     }

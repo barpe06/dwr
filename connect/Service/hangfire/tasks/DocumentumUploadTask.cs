@@ -11,6 +11,7 @@ using System.IO;
 using connect.Models.documentum;
 using connect.Service.documentum;
 using log4net;
+using connect.Service.documentum.utils;
 
 namespace connect.Service.hangfire.tasks
 {
@@ -28,10 +29,12 @@ namespace connect.Service.hangfire.tasks
                 DocumentOptions.Individual);
         }*/
         [DisplayName("Uploading document {3} for envelope {2}")]
-        public static void uploadDocument(string domain, string account,
+        public static void uploadDocument(IDictionary<string, string> localParams,
             string envelopeId, string documentId, DocumentOptions options)
         {
-            MemoryStream docStream = DocuSignService.GetDocument(domain, account,
+
+            MemoryStream docStream = DocuSignService.GetDocument(localParams[EnvelopeMetaFields.Environment], 
+                localParams[EnvelopeMetaFields.AccountId],
                 envelopeId,
                 documentId,
                 options);
@@ -42,7 +45,8 @@ namespace connect.Service.hangfire.tasks
            
 
             //ContentPropertyResponse response = DocumentumService.CreateContentlessDocumentLinkToFolder("ECMTEST", "0b7e5f9f80458b40");
-            var response = DocumentumService.uploadDocument("ECMTEST", "0b7e5f9f80458b40", buffer);
+            //var response = DocumentumService.uploadDocument("ECMTEST", "0b7e5f9f80458b40", buffer);
+            var response = DocumentumService.uploadDocument(localParams, buffer);
             Log.Debug("Properties created: ");
         }
     }

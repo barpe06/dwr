@@ -223,9 +223,11 @@
     <Compile Include="Service\docusign\DocuSignCredentials.cs" />
     <Compile Include="Service\docusign\DocuSignService.cs" />
     <Compile Include="Service\docusign\utils\DocumentRetrieveOptions.cs" />
+    <Compile Include="Service\documentum\utils\EnvelopeMetaFields.cs" />
     <Compile Include="Service\docusign\utils\DocuSignEnvironment.cs" />
     <Compile Include="Service\docusign\utils\ServiceUtil.cs" />
     <Compile Include="Service\hangfire\tasks\DocumentumUploadTask.cs" />
+    <Compile Include="Service\util\StringExt.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -250,6 +252,7 @@
     <Content Include="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Properties\PublishProfiles\DocuSignConnector.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

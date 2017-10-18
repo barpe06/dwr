@@ -184,12 +184,6 @@ namespace connect.Service.documentum.api
             var restClient = new RestClient(contentsList.href);
             RestRequest request = new RestRequest(Method.PUT);
 
-            /*request.AddUrlSegment("envelopeId", envelopeId);
-            request.AddUrlSegment("documentId", documentId);
-            request.AddHeader("Content-Type", "application/pdf");
-            request.AddHeader("Content-Disposition",
-                string.Format("file; filename=\"{0}\"; documentid={1}; fileExtension=\"{2}\"",
-                Path.GetFileNameWithoutExtension(fullFileName), documentId, Path.GetExtension(fullFileName)));*/
             request.AddHeader("Accept", "application/pdf");
             request.AddParameter("application/pdf", documentBytes, ParameterType.RequestBody);
 
@@ -212,18 +206,46 @@ namespace connect.Service.documentum.api
             request.AddParameter("machine[safe_token]", safe_token);
             request.AddFile("receipt[receipt_file]", File.ReadAllBytes(path), "Invoice.pdf", "application/octet-stream");
             */
-            request.AddHeader("Authorization", DocmentumServiceUtils.CreateBasicBearToken());
+            request.AddHeader("Authorization", DocumentumServiceUtils.CreateBasicBearToken());
             RestClient restClient = new RestClient(
                 System.Configuration.ConfigurationManager.AppSettings["documentumUrl"].Replace("{REPO}", repo));
             var response = restClient.Execute(request);
             Log.Info("Called documentum with response: " + response);
         }
 
-        public void UploadDocsWithProperties(string repo, string folderId, byte[] documentBytes, string fileName, ContentProperty contentProperty = null)
+        public void UploadDocsWithProperties(IDictionary<string,string> ecf, byte[] documentBytes)
         {
+            // let's check that all my envelope custom fields are not null
+            foreach(KeyValuePair<string, string> entry in ecf)
+            {
+                if (entry.Value == null)
+                {
+                    throw new ApiException(400, "Missing required envelope custom field parameter " +  entry.Key + " when calling DocumentumService->uploadDocument");
+                }
+            }
 
-            string requestHost = System.Configuration.ConfigurationManager.AppSettings["documentumUrl"].Replace("{REPO}", repo);
-            var localVarPath = "/folders/{folderId}/documents?overwrite=true".Replace("{folderId}", folderId);
+            if (ecf[EnvelopeMetaFields.DocumentType] == null)
+            {
+                throw new ApiException(400, "Missing required envelope custom field parameter 'documentum type' when calling DocumentumService->uploadDocument");
+            }
+            if (ecf[EnvelopeMetaFields.AccountId] == null)
+            {
+                throw new ApiException(400, "Missing required envelope custom field parameter " +  EnvelopeMetaFields.AccountId + " when calling DocumentumService->uploadDocument");
+            }
+
+            var documentumApi = new DocumentumApi();
+            ContentProperty contentProperty = new ContentProperty();
+            contentProperty.properties = new PropertiesType();
+            contentProperty.properties.r_object_type = ecf[EnvelopeMetaFields.DocumentType];
+            contentProperty.properties.object_name = ecf[EnvelopeMetaFields.PolicyNumber] + "-" + ecf[EnvelopeMetaFields.FormID];
+            contentProperty.properties.author_creator = ecf[EnvelopeMetaFields.AuthorCreator];
+            contentProperty.properties.author_date = ecf[EnvelopeMetaFields.AuthoredDate];
+            contentProperty.properties.subject = ecf[EnvelopeMetaFields.Subject];
+            contentProperty.properties.topic_subject = ecf[EnvelopeMetaFields.FormID] + "-" + ecf[EnvelopeMetaFields.FormDescription];
+            contentProperty.properties.business_record = ecf[EnvelopeMetaFields.BusinessRecord];
+
+            string requestHost = System.Configuration.ConfigurationManager.AppSettings["documentumUrl"].Replace("{REPO}", ecf[EnvelopeMetaFields.Repository]);
+            var localVarPath = "/folders/{folderId}/documents?overwrite=true".Replace("{folderId}", ecf[EnvelopeMetaFields.FolderId]);
 
             // Create a http request to the server endpoint that will pick up the
             // file and file description.
@@ -231,11 +253,11 @@ namespace connect.Service.documentum.api
                 (HttpWebRequest)WebRequest.Create(requestHost + localVarPath);
             string boundaryString = "FFF3F395A90B452BB8BEDC878DDBD152";
             
-            // Set the http request header \\
+            // Set the http request header 
             requestToServerEndpoint.Method = WebRequestMethods.Http.Post;
             requestToServerEndpoint.ContentType = "multipart/form-data; boundary=" + boundaryString;
             requestToServerEndpoint.KeepAlive = true;
-            requestToServerEndpoint.Headers.Add("Authorization", "Basic " + DocmentumServiceUtils.CreateBasicBearToken()); 
+            requestToServerEndpoint.Headers.Add("Authorization", "Basic " + DocumentumServiceUtils.CreateBasicBearToken()); 
             requestToServerEndpoint.Accept = "application/vnd.emc.documentum+json";
 
             // Use a MemoryStream to form the post data request,
@@ -276,9 +298,32 @@ namespace connect.Service.documentum.api
 
             postDataStream.Close();
             s.Close();
+            try
+            {
+                var response = requestToServerEndpoint.GetResponse();
+                Log.Info("Called documentum with response: " + response);
 
-            var response = requestToServerEndpoint.GetResponse();
-            Log.Info("Called documentum with response: " + response);
+            }
+            catch (WebException ex)
+            {
+                using (var stream = ex.Response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
+                {
+                    throw new ApiException((int)GetHttpStatusCode(ex), "Error calling DocumentumApi=>UploadDocsWithProperties ", reader.ReadToEnd());
+                }
+                    
+            }
+            
+        }
+
+        HttpStatusCode GetHttpStatusCode(WebException we)
+        {
+            if (we.Response is HttpWebResponse)
+            {
+                HttpWebResponse response = (HttpWebResponse)we.Response;
+                return response.StatusCode;
+            }
+            return 0;
         }
 
     }

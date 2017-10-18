@@ -22,11 +22,11 @@ namespace connect.Models.documentum
         [JsonProperty("topic_subject")]
         public string topic_subject { get; set; }
 
-        //[JsonProperty("r_full_content_size")]
-        //public int r_full_content_size { get; set; }
+        [JsonProperty("business_record")]
+        public string business_record { get; set; }
 
-        //[JsonProperty("format_name")]
-        //public string format_name { get; set; }
+        [JsonProperty("subject")]
+        public string subject { get; set; }
     }
 
     public class ContentProperty

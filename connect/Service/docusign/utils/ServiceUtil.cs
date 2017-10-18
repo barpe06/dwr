@@ -22,6 +22,7 @@ namespace connect.Service.docusign.utils
             return env;
         }
 
+
         public static void ConfigureApiClient(string domain)
         {
             ApiClient apiClient = new ApiClient(ConfigurationManager.AppSettings["baseUrl"].Replace("{AccountSite}", domain));
