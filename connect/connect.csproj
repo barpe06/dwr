@@ -219,6 +219,7 @@
     <Compile Include="Service\documentum\api\DocumentumApi.cs" />
     <Compile Include="Service\documentum\api\IDocumentumApi.cs" />
     <Compile Include="Service\documentum\DocumentumService.cs" />
+    <Compile Include="Service\documentum\filter\HangFireCustomAutoRetryJobFilterAttribute.cs" />
     <Compile Include="Service\documentum\utils\DocmentumServiceUtils.cs" />
     <Compile Include="Service\docusign\DocuSignCredentials.cs" />
     <Compile Include="Service\docusign\DocuSignService.cs" />

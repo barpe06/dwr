@@ -32,7 +32,7 @@ namespace connect.Service.hangfire.tasks
         public static void uploadDocument(IDictionary<string, string> localParams,
             string envelopeId, string documentId, DocumentOptions options)
         {
-
+            //Now retrieve the documents for the given envelope from the accountId hosted in environment as combined
             MemoryStream docStream = DocuSignService.GetDocument(localParams[EnvelopeMetaFields.Environment], 
                 localParams[EnvelopeMetaFields.AccountId],
                 envelopeId,
@@ -40,12 +40,8 @@ namespace connect.Service.hangfire.tasks
                 options);
 
 
-
+            // Now upload the bytes for teh document that we just retrieved in Documentum
             byte[] buffer = ServiceUtil.ReadFully(docStream);
-           
-
-            //ContentPropertyResponse response = DocumentumService.CreateContentlessDocumentLinkToFolder("ECMTEST", "0b7e5f9f80458b40");
-            //var response = DocumentumService.uploadDocument("ECMTEST", "0b7e5f9f80458b40", buffer);
             var response = DocumentumService.uploadDocument(localParams, buffer);
             Log.Debug("Properties created: ");
         }

@@ -81,7 +81,6 @@ namespace connect.Service.documentum.utils
             customField = envelopeInfo.EnvelopeStatus.CustomFields.CustomField.Find(finder);
             string repository = customField == null ? null : customField.Value;
             ecf.Add(EnvelopeMetaFields.Repository, repository);
-            
 
             ecf.Add(EnvelopeMetaFields.Subject, envelopeInfo.EnvelopeStatus.EnvelopeID);
             //Author-Creator will have the name of each signers concatenated

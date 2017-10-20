@@ -224,15 +224,6 @@ namespace connect.Service.documentum.api
                 }
             }
 
-            if (ecf[EnvelopeMetaFields.DocumentType] == null)
-            {
-                throw new ApiException(400, "Missing required envelope custom field parameter 'documentum type' when calling DocumentumService->uploadDocument");
-            }
-            if (ecf[EnvelopeMetaFields.AccountId] == null)
-            {
-                throw new ApiException(400, "Missing required envelope custom field parameter " +  EnvelopeMetaFields.AccountId + " when calling DocumentumService->uploadDocument");
-            }
-
             var documentumApi = new DocumentumApi();
             ContentProperty contentProperty = new ContentProperty();
             contentProperty.properties = new PropertiesType();
@@ -275,16 +266,9 @@ namespace connect.Service.documentum.api
             postDataWriter.Write("\r\n--" + boundaryString + "\r\n");
             postDataWriter.Write("Content-Disposition: form-data; name=\"content\"\r\n");
             postDataWriter.Write("Content-Type: application/pdf\r\n\r\n");
-            //postDataWriter.Write("Content-Type: plain/text; charset=UTF-8\r\n\r\n");
-
-           // postDataWriter.Write("Content-Type: application/octet-stream\r\n");
-            //postDataWriter.Write("Content-Transfer-Encoding: binary\r\n\r\n");
-
             postDataWriter.Flush();
 
             postDataStream.Write(documentBytes, 0, documentBytes.Length);
-            //postDataWriter.Write("Hello world");
-
             postDataWriter.Write("\r\n--" + boundaryString + "--\r\n");
             postDataWriter.Flush();
 
